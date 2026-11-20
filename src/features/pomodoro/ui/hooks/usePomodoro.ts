@@ -152,8 +152,9 @@ export function usePomodoro({
     const handleKeyDown = (event: KeyboardEvent) => {
       const target = event.target as HTMLElement | null;
       if (
-        target &&
-        (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)
+        (target &&
+          (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) ||
+        document.querySelector('[role="dialog"]')
       ) {
         return;
       }
@@ -168,10 +169,14 @@ export function usePomodoro({
         } else {
           timerService.start();
         }
-      } else if (event.code === 'KeyR') {
+      } else if (event.code === 'KeyR' || event.key === 'r' || event.key === 'R') {
         event.preventDefault();
         setTransitionEvent(null);
         timerService.reset();
+      } else if (event.code === 'KeyS' || event.key === 's' || event.key === 'S') {
+        event.preventDefault();
+        setTransitionEvent(null);
+        timerService.skip(true);
       }
     };
 

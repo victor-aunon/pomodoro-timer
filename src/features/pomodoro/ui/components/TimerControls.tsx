@@ -53,6 +53,7 @@ export function TimerControls({
           className="btn btn-primary btn-lg"
           onClick={onPause}
           aria-label="Pause timer"
+          title="Pause timer [Space]"
         >
           <span>❚❚</span> Pause <span className="hotkey-hint">[Space]</span>
         </button>
@@ -62,6 +63,7 @@ export function TimerControls({
           className="btn btn-primary btn-lg"
           onClick={onResume}
           aria-label="Resume timer"
+          title="Resume timer [Space]"
         >
           <span>▶</span> Resume <span className="hotkey-hint">[Space]</span>
         </button>
@@ -71,6 +73,7 @@ export function TimerControls({
           className="btn btn-primary btn-lg"
           onClick={onStart}
           aria-label="Start timer"
+          title="Start timer [Space]"
         >
           <span>▶</span> Start <span className="hotkey-hint">[Space]</span>
         </button>
