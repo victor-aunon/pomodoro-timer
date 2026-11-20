@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="100%" height="100%">
+  <defs>
+    <style>
+      :root {
+        --tomato-primary: #e11d48;
+        --tomato-shadow: #be123c;
+        --leaf-primary: #0d9488;
+        --leaf-shadow: #0f766e;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --tomato-primary: #fb7185;
+          --tomato-shadow: #f43f5e;
+          --leaf-primary: #2dd4bf;
+          --leaf-shadow: #0d9488;
+        }
+      }
+      .tomato-body {
+        fill: url(#tomatoGradient);
+      }
+      .leaf {
+        fill: url(#leafGradient);
+      }
+    </style>
+    <linearGradient id="tomatoGradient" x1="16" y1="10" x2="16" y2="30" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="var(--tomato-primary)" />
+      <stop offset="100%" stop-color="var(--tomato-shadow)" />
+    </linearGradient>
+    <linearGradient id="leafGradient" x1="16" y1="3" x2="16" y2="15" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="var(--leaf-primary)" />
+      <stop offset="100%" stop-color="var(--leaf-shadow)" />
+    </linearGradient>
+  </defs>
+
+  <!-- Tomato Body -->
+  <path
+    class="tomato-body"
+    d="M 16 12.2 C 12.5 10.2 4 11.5 4 19.5 C 4 26 10 29.5 16 29.5 C 22 29.5 28 26 28 19.5 C 28 11.5 19.5 10.2 16 12.2 Z"
+  />
+
+  <!-- Subtle specular highlight for depth -->
+  <path
+    d="M 8.5 15.5 C 7 18 7 21 8.5 23.5 C 8 21.5 8 18 9.5 16 C 10.2 15 11.2 14.2 12.5 13.8 C 10.8 14 9.4 14.6 8.5 15.5 Z"
+    fill="#ffffff"
+    opacity="0.25"
+  />
+
+  <!-- Foliage / Sepals -->
+  <!-- Left Sepal -->
+  <path
+    class="leaf"
+    d="M 16 12 C 13 11.2 9 9.2 7 6 C 8.8 10 12.5 12.5 15.5 12.5 Z"
+  />
+  <!-- Right Sepal -->
+  <path
+    class="leaf"
+    d="M 16 12 C 19 11.2 23 9.2 25 6 C 23.2 10 19.5 12.5 16.5 12.5 Z"
+  />
+  <!-- Center Sepal -->
+  <path
+    class="leaf"
+    d="M 14.8 12 C 15.4 13.8 16 15 16 15 C 16 15 16.6 13.8 17.2 12 Z"
+  />
+  <!-- Stem -->
+  <path
+    class="leaf"
+    d="M 15.2 12 C 15.2 7.8 16.8 4.6 20.2 3 C 19 5.8 17.6 8.4 16.8 12 Z"
+  />
+</svg>

@@ -1,0 +1,14 @@
+{
+  "workDurationMinutes": 25,
+  "shortBreakDurationMinutes": 5,
+  "longBreakDurationMinutes": 15,
+  "longBreakInterval": 4,
+  "autoStartBreaks": false,
+  "autoStartPomodoros": false,
+  "sound": {
+    "enabled": true,
+    "volume": 0.8,
+    "workSound": "bell",
+    "breakSound": "chime"
+  }
+}

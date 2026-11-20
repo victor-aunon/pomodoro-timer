@@ -1,0 +1,21 @@
+{
+  "schema_version": "1.0",
+  "workflows": {
+    "speckit": {
+      "name": "Full SDD Cycle",
+      "version": "1.0.1",
+      "description": "Runs specify → plan → tasks → implement with review gates",
+      "source": "bundled",
+      "installed_at": "2026-11-19T13:48:26.350435+00:00",
+      "updated_at": "2026-11-19T13:48:26.350448+00:00"
+    },
+    "viteplus-stitch": {
+      "name": "Vite+ Stitch SDD Lifecycle",
+      "version": "1.1.0",
+      "description": "Deterministic SDD workflow featuring Vite+, Google Stitch MCP, phase checkpoints, and architectural, env-config & visual quality gates",
+      "source": "local-bundle",
+      "installed_at": "2026-11-19T13:48:52Z",
+      "updated_at": "2026-11-19T13:48:52Z"
+    }
+  }
+}

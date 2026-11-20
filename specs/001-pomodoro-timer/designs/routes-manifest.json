@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "Mapping of Google Stitch screens and UI components to local Playwright routes",
+  "screens": [
+    {
+      "id": "screen-timer-dashboard",
+      "name": "Timer Dashboard (Work Session & Active Task)",
+      "route": "/",
+      "selector": "[data-testid='timer-dashboard']",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "waitForSelector": "[data-testid='timer-display']",
+      "maskSelectors": ["[data-testid='current-time']"],
+      "fixtures": {
+        "/api/timer/state": "./fixtures/timer-state.json",
+        "/api/tasks": "./fixtures/tasks.json",
+        "/api/preferences": "./fixtures/preferences.json"
+      }
+    },
+    {
+      "id": "screen-task-history",
+      "name": "Task Management & Focus Session History",
+      "route": "/history",
+      "selector": "[data-testid='task-history-view']",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "waitForSelector": "[data-testid='history-timeline']",
+      "maskSelectors": ["[data-testid='completed-at-timestamp']"],
+      "fixtures": {
+        "/api/tasks": "./fixtures/tasks.json",
+        "/api/history": "./fixtures/history.json"
+      }
+    },
+    {
+      "id": "screen-settings-dialog",
+      "name": "Interval Durations & Audio Settings Dialog",
+      "route": "/settings",
+      "selector": "[data-testid='settings-dialog']",
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "waitForSelector": "[data-testid='settings-content']",
+      "maskSelectors": [],
+      "fixtures": {
+        "/api/preferences": "./fixtures/preferences.json"
+      }
+    }
+  ]
+}

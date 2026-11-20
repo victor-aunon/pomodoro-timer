@@ -1,0 +1,841 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task Management & Focus History - Pomodoro Focus</title>
+    <link rel="stylesheet" href="./tokens.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: var(--font-family);
+        background-color: var(--color-background);
+        color: var(--color-text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: var(--line-height-normal);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .app-header {
+        width: 100%;
+        max-width: 860px;
+        padding: var(--space-6) var(--space-6) var(--space-4);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--color-border-subtle);
+      }
+
+      .back-nav {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        transition: color var(--transition-fast);
+      }
+
+      .back-nav:hover {
+        color: var(--color-text);
+      }
+
+      .header-title {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-bold);
+      }
+
+      /* Main Container */
+      main[data-testid='task-history-view'] {
+        width: 100%;
+        max-width: 860px;
+        padding: var(--space-6) var(--space-6) var(--space-16);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-8);
+        flex: 1;
+      }
+
+      /* Aggregate Statistics Banner */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: var(--space-4);
+      }
+
+      .stat-card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-5);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-1);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .stat-label {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-weight: var(--font-weight-semibold);
+      }
+
+      .stat-value {
+        font-size: var(--font-size-3xl);
+        font-weight: var(--font-weight-bold);
+        font-family: var(--font-family-mono);
+        color: var(--color-text);
+        display: flex;
+        align-items: baseline;
+        gap: var(--space-2);
+      }
+
+      .stat-subtext {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
+      }
+
+      /* Section Headers */
+      .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: var(--space-4);
+      }
+
+      .section-title {
+        font-size: var(--font-size-lg);
+        font-weight: var(--font-weight-bold);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+      }
+
+      /* Add Task Form */
+      .task-form-card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-5);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .task-form {
+        display: flex;
+        gap: var(--space-3);
+        flex-wrap: wrap;
+      }
+
+      .input-group-title {
+        flex: 1;
+        min-width: 280px;
+        position: relative;
+      }
+
+      .form-input {
+        width: 100%;
+        background: var(--color-background-subtle);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: var(--space-3) var(--space-4);
+        color: var(--color-text);
+        font-family: var(--font-family);
+        font-size: var(--font-size-sm);
+        transition: all var(--transition-fast);
+      }
+
+      .form-input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: var(--focus-ring);
+      }
+
+      .input-char-counter {
+        position: absolute;
+        right: 12px;
+        top: 14px;
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
+        pointer-events: none;
+      }
+
+      .input-group-estimate {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        background: var(--color-background-subtle);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: var(--space-2) var(--space-3);
+      }
+
+      .estimate-label {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-secondary);
+        font-weight: var(--font-weight-medium);
+        white-space: nowrap;
+      }
+
+      .estimate-input {
+        width: 50px;
+        background: transparent;
+        border: none;
+        color: var(--color-text);
+        font-family: var(--font-family-mono);
+        font-size: var(--font-size-sm);
+        text-align: center;
+        font-weight: var(--font-weight-bold);
+      }
+
+      .estimate-input:focus {
+        outline: none;
+      }
+
+      .btn-add-task {
+        background: var(--color-primary);
+        color: #ffffff;
+        border: none;
+        border-radius: var(--radius-md);
+        padding: var(--space-3) var(--space-5);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        transition: background var(--transition-fast);
+        white-space: nowrap;
+      }
+
+      .btn-add-task:hover {
+        background: var(--color-primary-hover);
+      }
+
+      .btn-add-task:focus-visible {
+        outline: none;
+        box-shadow: var(--focus-ring);
+      }
+
+      /* Task List */
+      .task-list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-3);
+      }
+
+      .task-item {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: var(--space-4);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-3);
+        transition: border-color var(--transition-fast);
+      }
+
+      .task-item.is-active-target {
+        border-color: var(--color-primary);
+        background: linear-gradient(
+          90deg,
+          var(--color-primary-subtle) 0%,
+          var(--color-surface) 30%
+        );
+      }
+
+      .task-item.is-completed {
+        opacity: 0.6;
+      }
+
+      .task-item.is-completed .task-title-text {
+        text-decoration: line-through;
+      }
+
+      .task-main-info {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        flex: 1;
+        min-width: 0;
+      }
+
+      .btn-check-task {
+        width: 24px;
+        height: 24px;
+        border-radius: var(--radius-xs);
+        border: 2px solid var(--color-border-strong);
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #ffffff;
+        transition: all var(--transition-fast);
+        flex-shrink: 0;
+      }
+
+      .task-item.is-completed .btn-check-task {
+        background: var(--color-success);
+        border-color: var(--color-success);
+      }
+
+      .task-title-text {
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        color: var(--color-text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .task-tally-badge {
+        display: flex;
+        align-items: center;
+        gap: var(--space-1);
+        font-size: var(--font-size-xs);
+        font-family: var(--font-family-mono);
+        background: var(--color-background-subtle);
+        border: 1px solid var(--color-border);
+        padding: var(--space-1) var(--space-2);
+        border-radius: var(--radius-xs);
+        color: var(--color-text-secondary);
+        flex-shrink: 0;
+      }
+
+      .active-tag {
+        font-size: 10px;
+        text-transform: uppercase;
+        font-weight: var(--font-weight-bold);
+        background: var(--color-primary-subtle);
+        color: var(--color-primary);
+        border: 1px solid var(--color-primary-border);
+        padding: 2px 6px;
+        border-radius: var(--radius-full);
+        flex-shrink: 0;
+      }
+
+      .task-actions-group {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        flex-shrink: 0;
+      }
+
+      .btn-task-secondary {
+        background: transparent;
+        border: 1px solid var(--color-border);
+        color: var(--color-text-secondary);
+        padding: var(--space-1) var(--space-3);
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-medium);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+      }
+
+      .btn-task-secondary:hover {
+        background: var(--color-surface-hover);
+        color: var(--color-text);
+        border-color: var(--color-border-strong);
+      }
+
+      .btn-task-delete {
+        background: transparent;
+        border: none;
+        color: var(--color-text-muted);
+        cursor: pointer;
+        padding: var(--space-1);
+        border-radius: var(--radius-xs);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: color var(--transition-fast);
+      }
+
+      .btn-task-delete:hover {
+        color: var(--color-danger);
+      }
+
+      /* History Timeline */
+      .history-group {
+        margin-bottom: var(--space-6);
+      }
+
+      .history-group-header {
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-bold);
+        color: var(--color-text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: var(--space-3);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .history-card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: var(--space-3) var(--space-4);
+        margin-bottom: var(--space-2);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+      }
+
+      .history-info {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+        min-width: 0;
+      }
+
+      .history-mode-pill {
+        background: var(--color-work-subtle);
+        border: 1px solid var(--color-work-border);
+        color: var(--color-work);
+        font-size: 11px;
+        font-weight: var(--font-weight-bold);
+        padding: 2px 8px;
+        border-radius: var(--radius-full);
+        text-transform: uppercase;
+        flex-shrink: 0;
+      }
+
+      .history-task-title {
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        color: var(--color-text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .history-meta {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
+        flex-shrink: 0;
+      }
+
+      .history-timestamp {
+        font-family: var(--font-family-mono);
+      }
+
+      /* Empty State Pattern */
+      .empty-state {
+        background: var(--color-surface);
+        border: 1px dashed var(--color-border-strong);
+        border-radius: var(--radius-lg);
+        padding: var(--space-10) var(--space-6);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: var(--space-3);
+      }
+
+      .empty-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: var(--radius-full);
+        background: var(--color-background-subtle);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--color-text-muted);
+      }
+
+      .empty-title {
+        font-size: var(--font-size-base);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-text);
+      }
+
+      .empty-desc {
+        font-size: var(--font-size-sm);
+        color: var(--color-text-secondary);
+        max-width: 360px;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="app-header">
+      <a
+        href="./screen-timer-dashboard.html"
+        class="back-nav"
+        aria-label="Return to Timer Dashboard"
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Timer Dashboard</span>
+      </a>
+      <h1 class="header-title">Tasks & History</h1>
+      <a href="./screen-settings-dialog.html" class="back-nav" aria-label="Settings">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="12" cy="12" r="3"></circle>
+          <path
+            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
+          ></path>
+        </svg>
+      </a>
+    </header>
+
+    <main data-testid="task-history-view">
+      <!-- Productivity Summary -->
+      <section class="stats-grid" aria-label="Productivity summary">
+        <div class="stat-card">
+          <span class="stat-label">Total Focus Time</span>
+          <div class="stat-value">2h 30m</div>
+          <span class="stat-subtext">Across 6 completed sessions</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Completed Pomodoros</span>
+          <div class="stat-value">
+            6
+            <span style="font-size: var(--font-size-base); color: var(--color-work)"
+              >&bull; 🍅</span
+            >
+          </div>
+          <span class="stat-subtext">3 completed today</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-label">Tasks Finished</span>
+          <div class="stat-value">1 / 3</div>
+          <span class="stat-subtext">33% completion rate</span>
+        </div>
+      </section>
+
+      <!-- Task Management Section -->
+      <section aria-labelledby="task-mgmt-heading">
+        <div class="section-header">
+          <h2 class="section-title" id="task-mgmt-heading">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <polyline points="9 11 12 14 22 4"></polyline>
+              <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+            </svg>
+            Active Tasks
+          </h2>
+        </div>
+
+        <!-- Add Task Form -->
+        <div class="task-form-card" style="margin-bottom: var(--space-4)">
+          <form class="task-form" id="create-task-form">
+            <div class="input-group-title">
+              <input
+                type="text"
+                class="form-input"
+                id="task-title-input"
+                placeholder="What are you focusing on?"
+                maxlength="100"
+                required
+              />
+              <span class="input-char-counter" id="char-counter">0/100</span>
+            </div>
+            <div class="input-group-estimate">
+              <label for="task-est-input" class="estimate-label">Est. 🍅</label>
+              <input
+                type="number"
+                class="estimate-input"
+                id="task-est-input"
+                min="1"
+                max="20"
+                value="2"
+              />
+            </div>
+            <button type="submit" class="btn-add-task">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+              Add Task
+            </button>
+          </form>
+        </div>
+
+        <!-- Task Items -->
+        <div class="task-list">
+          <!-- Active Target Task -->
+          <article class="task-item is-active-target">
+            <div class="task-main-info">
+              <button
+                type="button"
+                class="btn-check-task"
+                aria-label="Mark task complete"
+                title="Complete task"
+              ></button>
+              <span class="active-tag">Active Target</span>
+              <span class="task-title-text">Refactor Auth & Session Management</span>
+            </div>
+            <div class="task-actions-group">
+              <span class="task-tally-badge">🍅 3 / 4</span>
+              <button type="button" class="btn-task-delete" aria-label="Delete task">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path
+                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </article>
+
+          <!-- Secondary Active Task -->
+          <article class="task-item">
+            <div class="task-main-info">
+              <button
+                type="button"
+                class="btn-check-task"
+                aria-label="Mark task complete"
+                title="Complete task"
+              ></button>
+              <span class="task-title-text">Design System Audit & Token Alignment</span>
+            </div>
+            <div class="task-actions-group">
+              <button type="button" class="btn-task-secondary">Set as Focus</button>
+              <span class="task-tally-badge">🍅 1 / 2</span>
+              <button type="button" class="btn-task-delete" aria-label="Delete task">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path
+                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </article>
+
+          <!-- Completed Task -->
+          <article class="task-item is-completed">
+            <div class="task-main-info">
+              <button
+                type="button"
+                class="btn-check-task"
+                aria-label="Task completed"
+                title="Completed"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3"
+                >
+                  <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+              </button>
+              <span class="task-title-text">Implement Audio Notification Port</span>
+            </div>
+            <div class="task-actions-group">
+              <span class="task-tally-badge">🍅 3 / 3</span>
+              <button type="button" class="btn-task-delete" aria-label="Delete task">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path
+                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                  ></path>
+                </svg>
+              </button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <!-- Focus History Timeline Section -->
+      <section aria-labelledby="history-heading" data-testid="history-timeline">
+        <div class="section-header">
+          <h2 class="section-title" id="history-heading">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            Focus Session History
+          </h2>
+          <button
+            type="button"
+            class="btn-task-secondary"
+            style="color: var(--color-danger); border-color: rgba(239, 68, 68, 0.3)"
+          >
+            Clear History
+          </button>
+        </div>
+
+        <!-- Group: Today -->
+        <div class="history-group">
+          <div class="history-group-header">
+            <span>Today &bull; Nov 19, 2026</span>
+            <span>3 sessions (1h 15m)</span>
+          </div>
+
+          <div class="history-card">
+            <div class="history-info">
+              <span class="history-mode-pill">Work</span>
+              <span class="history-task-title">Refactor Auth & Session Management</span>
+            </div>
+            <div class="history-meta">
+              <span>25 min</span>
+              <time class="history-timestamp" data-testid="completed-at-timestamp">11:20 AM</time>
+            </div>
+          </div>
+
+          <div class="history-card">
+            <div class="history-info">
+              <span class="history-mode-pill">Work</span>
+              <span class="history-task-title">Refactor Auth & Session Management</span>
+            </div>
+            <div class="history-meta">
+              <span>25 min</span>
+              <time class="history-timestamp" data-testid="completed-at-timestamp">10:45 AM</time>
+            </div>
+          </div>
+
+          <div class="history-card">
+            <div class="history-info">
+              <span class="history-mode-pill">Work</span>
+              <span class="history-task-title">Design System Audit & Token Alignment</span>
+            </div>
+            <div class="history-meta">
+              <span>25 min</span>
+              <time class="history-timestamp" data-testid="completed-at-timestamp">10:10 AM</time>
+            </div>
+          </div>
+        </div>
+
+        <!-- Group: Yesterday -->
+        <div class="history-group">
+          <div class="history-group-header">
+            <span>Yesterday &bull; Nov 18, 2026</span>
+            <span>3 sessions (1h 15m)</span>
+          </div>
+
+          <div class="history-card">
+            <div class="history-info">
+              <span class="history-mode-pill">Work</span>
+              <span class="history-task-title">Implement Audio Notification Port</span>
+            </div>
+            <div class="history-meta">
+              <span>25 min</span>
+              <time class="history-timestamp" data-testid="completed-at-timestamp">4:30 PM</time>
+            </div>
+          </div>
+
+          <div class="history-card">
+            <div class="history-info">
+              <span class="history-mode-pill">Work</span>
+              <span class="history-task-title">Implement Audio Notification Port</span>
+            </div>
+            <div class="history-meta">
+              <span>25 min</span>
+              <time class="history-timestamp" data-testid="completed-at-timestamp">3:55 PM</time>
+            </div>
+          </div>
+
+          <div class="history-card">
+            <div class="history-info">
+              <span class="history-mode-pill">Work</span>
+              <span class="history-task-title">General Focus Session</span>
+            </div>
+            <div class="history-meta">
+              <span>25 min</span>
+              <time class="history-timestamp" data-testid="completed-at-timestamp">2:40 PM</time>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      const titleInput = document.getElementById('task-title-input');
+      const counter = document.getElementById('char-counter');
+      titleInput.addEventListener('input', (e) => {
+        counter.textContent = `${e.target.value.length}/100`;
+      });
+    </script>
+  </body>
+</html>

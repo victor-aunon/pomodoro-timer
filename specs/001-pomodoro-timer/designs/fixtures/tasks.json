@@ -1,0 +1,29 @@
+[
+  {
+    "id": "task-uuid-001",
+    "title": "Refactor Auth & Session Management",
+    "estimatedPomodoros": 4,
+    "completedPomodoros": 3,
+    "status": "active",
+    "createdAt": 1731998400000,
+    "updatedAt": 1732014000000
+  },
+  {
+    "id": "task-uuid-002",
+    "title": "Design System Audit & Token Alignment",
+    "estimatedPomodoros": 2,
+    "completedPomodoros": 1,
+    "status": "active",
+    "createdAt": 1732002000000,
+    "updatedAt": 1732009200000
+  },
+  {
+    "id": "task-uuid-003",
+    "title": "Implement Audio Notification Port",
+    "estimatedPomodoros": 3,
+    "completedPomodoros": 3,
+    "status": "completed",
+    "createdAt": 1731912000000,
+    "updatedAt": 1731926400000
+  }
+]

@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timer Settings & Preferences - Pomodoro Focus</title>
+    <link rel="stylesheet" href="./tokens.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: var(--font-family);
+        background-color: var(--color-background);
+        color: var(--color-text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        line-height: var(--line-height-normal);
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .app-header {
+        width: 100%;
+        max-width: 720px;
+        padding: var(--space-6) var(--space-6) var(--space-4);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--color-border-subtle);
+      }
+
+      .back-nav {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        color: var(--color-text-secondary);
+        text-decoration: none;
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        transition: color var(--transition-fast);
+      }
+
+      .back-nav:hover {
+        color: var(--color-text);
+      }
+
+      .header-title {
+        font-size: var(--font-size-xl);
+        font-weight: var(--font-weight-bold);
+      }
+
+      /* Main Settings Container */
+      main[data-testid='settings-dialog'] {
+        width: 100%;
+        max-width: 720px;
+        padding: var(--space-6) var(--space-6) var(--space-16);
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-8);
+        flex: 1;
+      }
+
+      .settings-card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-lg);
+        padding: var(--space-6);
+        box-shadow: var(--shadow-sm);
+      }
+
+      .card-title {
+        font-size: var(--font-size-base);
+        font-weight: var(--font-weight-bold);
+        margin-bottom: var(--space-1);
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+      }
+
+      .card-description {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-secondary);
+        margin-bottom: var(--space-5);
+      }
+
+      /* Duration Input Fields Grid */
+      .durations-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        gap: var(--space-4);
+        margin-bottom: var(--space-6);
+      }
+
+      .duration-field {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-2);
+      }
+
+      .field-label {
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        color: var(--color-text-secondary);
+      }
+
+      .field-input-wrapper {
+        position: relative;
+      }
+
+      .duration-input {
+        width: 100%;
+        background: var(--color-background-subtle);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: var(--space-3) var(--space-4);
+        color: var(--color-text);
+        font-family: var(--font-family-mono);
+        font-size: var(--font-size-base);
+        font-weight: var(--font-weight-bold);
+        transition: all var(--transition-fast);
+      }
+
+      .duration-input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: var(--focus-ring);
+      }
+
+      .field-unit {
+        position: absolute;
+        right: 12px;
+        top: 13px;
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
+        pointer-events: none;
+      }
+
+      .field-hint {
+        font-size: 11px;
+        color: var(--color-text-muted);
+      }
+
+      /* Toggle Rows */
+      .toggle-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-4) 0;
+        border-top: 1px solid var(--color-border-subtle);
+        gap: var(--space-4);
+      }
+
+      .toggle-info {
+        display: flex;
+        flex-direction: column;
+        gap: var(--space-0-5);
+      }
+
+      .toggle-label {
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        color: var(--color-text);
+      }
+
+      .toggle-subtext {
+        font-size: var(--font-size-xs);
+        color: var(--color-text-muted);
+      }
+
+      /* Switch Component */
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 48px;
+        height: 26px;
+        flex-shrink: 0;
+      }
+
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        inset: 0;
+        background-color: var(--color-border-strong);
+        border-radius: var(--radius-full);
+        transition: var(--transition-normal);
+      }
+
+      .slider::before {
+        position: absolute;
+        content: '';
+        height: 20px;
+        width: 20px;
+        left: 3px;
+        bottom: 3px;
+        background-color: white;
+        border-radius: var(--radius-full);
+        transition: var(--transition-normal);
+      }
+
+      input:checked + .slider {
+        background-color: var(--color-work);
+      }
+
+      input:focus-visible + .slider {
+        box-shadow: var(--focus-ring);
+      }
+
+      input:checked + .slider::before {
+        transform: translateX(22px);
+      }
+
+      /* Sound Profile Selection */
+      .sound-select-row {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: var(--space-3);
+        align-items: center;
+        margin-bottom: var(--space-4);
+      }
+
+      .select-dropdown {
+        background: var(--color-background-subtle);
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius-md);
+        padding: var(--space-3) var(--space-4);
+        color: var(--color-text);
+        font-family: var(--font-family);
+        font-size: var(--font-size-sm);
+        cursor: pointer;
+        width: 100%;
+      }
+
+      .select-dropdown:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: var(--focus-ring);
+      }
+
+      .btn-preview {
+        background: var(--color-surface-hover);
+        border: 1px solid var(--color-border);
+        color: var(--color-text);
+        padding: var(--space-3) var(--space-4);
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-xs);
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        transition: all var(--transition-fast);
+        white-space: nowrap;
+      }
+
+      .btn-preview:hover {
+        background: var(--color-surface-active);
+        border-color: var(--color-border-strong);
+      }
+
+      /* Range Slider */
+      .volume-slider-wrapper {
+        display: flex;
+        align-items: center;
+        gap: var(--space-4);
+        margin-top: var(--space-2);
+        margin-bottom: var(--space-6);
+      }
+
+      .range-slider {
+        flex: 1;
+        accent-color: var(--color-work);
+        height: 6px;
+        border-radius: var(--radius-full);
+        background: var(--color-border-strong);
+        cursor: pointer;
+      }
+
+      .volume-percentage {
+        font-family: var(--font-family-mono);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-bold);
+        min-width: 48px;
+        text-align: right;
+      }
+
+      /* Actions Footer */
+      .settings-footer {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--space-4);
+        flex-wrap: wrap;
+      }
+
+      .btn-reset-defaults {
+        background: transparent;
+        border: 1px solid var(--color-border);
+        color: var(--color-text-secondary);
+        padding: var(--space-3) var(--space-4);
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        cursor: pointer;
+        transition: all var(--transition-fast);
+      }
+
+      .btn-reset-defaults:hover {
+        background: var(--color-surface-hover);
+        color: var(--color-danger);
+        border-color: var(--color-danger);
+      }
+
+      .footer-primary-actions {
+        display: flex;
+        align-items: center;
+        gap: var(--space-3);
+      }
+
+      .btn-save-pref {
+        background: var(--color-primary);
+        color: #ffffff;
+        border: none;
+        padding: var(--space-3) var(--space-6);
+        border-radius: var(--radius-md);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-semibold);
+        cursor: pointer;
+        transition: background var(--transition-fast);
+        box-shadow: 0 2px 8px var(--color-primary-glow);
+      }
+
+      .btn-save-pref:hover {
+        background: var(--color-primary-hover);
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="app-header">
+      <a
+        href="./screen-timer-dashboard.html"
+        class="back-nav"
+        aria-label="Return to Timer Dashboard"
+      >
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        <span>Back to Timer</span>
+      </a>
+      <h1 class="header-title">Timer Preferences</h1>
+      <span style="width: 24px"></span>
+    </header>
+
+    <main data-testid="settings-dialog">
+      <div
+        data-testid="settings-content"
+        style="display: flex; flex-direction: column; gap: var(--space-6)"
+      >
+        <!-- Interval Durations Section -->
+        <section class="settings-card" aria-labelledby="durations-title">
+          <h2 class="card-title" id="durations-title">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <circle cx="12" cy="12" r="10"></circle>
+              <polyline points="12 6 12 12 16 14"></polyline>
+            </svg>
+            Interval Durations
+          </h2>
+          <p class="card-description">
+            Configure the length of work sessions and scheduled breaks.
+          </p>
+
+          <div class="durations-grid">
+            <div class="duration-field">
+              <label for="input-work" class="field-label">Work Session</label>
+              <div class="field-input-wrapper">
+                <input
+                  type="number"
+                  id="input-work"
+                  class="duration-input"
+                  value="25"
+                  min="1"
+                  max="120"
+                  required
+                />
+                <span class="field-unit">min</span>
+              </div>
+              <span class="field-hint">Range: 1–120 min</span>
+            </div>
+
+            <div class="duration-field">
+              <label for="input-short-break" class="field-label">Short Break</label>
+              <div class="field-input-wrapper">
+                <input
+                  type="number"
+                  id="input-short-break"
+                  class="duration-input"
+                  value="5"
+                  min="1"
+                  max="60"
+                  required
+                />
+                <span class="field-unit">min</span>
+              </div>
+              <span class="field-hint">Range: 1–60 min</span>
+            </div>
+
+            <div class="duration-field">
+              <label for="input-long-break" class="field-label">Long Break</label>
+              <div class="field-input-wrapper">
+                <input
+                  type="number"
+                  id="input-long-break"
+                  class="duration-input"
+                  value="15"
+                  min="1"
+                  max="60"
+                  required
+                />
+                <span class="field-unit">min</span>
+              </div>
+              <span class="field-hint">Range: 1–60 min</span>
+            </div>
+
+            <div class="duration-field">
+              <label for="input-long-interval" class="field-label">Long Break Every</label>
+              <div class="field-input-wrapper">
+                <input
+                  type="number"
+                  id="input-long-interval"
+                  class="duration-input"
+                  value="4"
+                  min="1"
+                  max="12"
+                  required
+                />
+                <span class="field-unit">cycles</span>
+              </div>
+              <span class="field-hint">Range: 1–12 cycles</span>
+            </div>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Auto-start Breaks</span>
+              <span class="toggle-subtext"
+                >Automatically start the break countdown when a work session concludes</span
+              >
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-auto-breaks" />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="toggle-row">
+            <div class="toggle-info">
+              <span class="toggle-label">Auto-start Pomodoros</span>
+              <span class="toggle-subtext"
+                >Automatically start the next focus period when a break concludes</span
+              >
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-auto-work" />
+              <span class="slider"></span>
+            </label>
+          </div>
+        </section>
+
+        <!-- Sound & Audio Notifications Section -->
+        <section class="settings-card" aria-labelledby="sound-title">
+          <h2 class="card-title" id="sound-title">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+            Auditory Notifications
+          </h2>
+          <p class="card-description">
+            Procedural audio chimes generated offline via the Web Audio API.
+          </p>
+
+          <div class="toggle-row" style="border-top: none; padding-top: 0">
+            <div class="toggle-info">
+              <span class="toggle-label">Enable Sound Notifications</span>
+              <span class="toggle-subtext"
+                >Play distinct audio chimes on work and break completions</span
+              >
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="toggle-sound" checked />
+              <span class="slider"></span>
+            </label>
+          </div>
+
+          <div class="volume-slider-wrapper">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+              <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+            </svg>
+            <input
+              type="range"
+              class="range-slider"
+              id="volume-slider"
+              min="0"
+              max="100"
+              value="80"
+            />
+            <span class="volume-percentage" id="volume-value">80%</span>
+          </div>
+
+          <div class="sound-select-row">
+            <div>
+              <label
+                for="select-work-sound"
+                class="field-label"
+                style="display: block; margin-bottom: var(--space-1)"
+                >Work Session Complete Sound</label
+              >
+              <select id="select-work-sound" class="select-dropdown">
+                <option value="bell" selected>Digital Bell (Clear high-resonance)</option>
+                <option value="chime">Soft Chime (Subtle melodic)</option>
+                <option value="marimba">Marimba (Warm acoustic strike)</option>
+              </select>
+            </div>
+            <button type="button" class="btn-preview" id="btn-preview-work">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              Preview
+            </button>
+          </div>
+
+          <div class="sound-select-row">
+            <div>
+              <label
+                for="select-break-sound"
+                class="field-label"
+                style="display: block; margin-bottom: var(--space-1)"
+                >Break Interval Complete Sound</label
+              >
+              <select id="select-break-sound" class="select-dropdown">
+                <option value="chime" selected>Soft Chime (Subtle melodic)</option>
+                <option value="bell">Digital Bell (Clear high-resonance)</option>
+                <option value="marimba">Marimba (Warm acoustic strike)</option>
+              </select>
+            </div>
+            <button type="button" class="btn-preview" id="btn-preview-break">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+              </svg>
+              Preview
+            </button>
+          </div>
+        </section>
+
+        <!-- Action Buttons Footer -->
+        <footer class="settings-footer">
+          <button type="button" class="btn-reset-defaults" id="btn-reset-defaults">
+            Reset to Defaults
+          </button>
+          <div class="footer-primary-actions">
+            <a
+              href="./screen-timer-dashboard.html"
+              class="btn-reset-defaults"
+              style="text-decoration: none"
+              >Cancel</a
+            >
+            <button type="button" class="btn-save-pref" id="btn-save-settings">
+              Save Preferences
+            </button>
+          </div>
+        </footer>
+      </div>
+    </main>
+
+    <script>
+      const volumeSlider = document.getElementById('volume-slider');
+      const volumeValue = document.getElementById('volume-value');
+      volumeSlider.addEventListener('input', (e) => {
+        volumeValue.textContent = `${e.target.value}%`;
+      });
+
+      document.getElementById('btn-save-settings').addEventListener('click', () => {
+        alert('Preferences saved successfully to local storage.');
+        window.location.href = './screen-timer-dashboard.html';
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,10 @@
+{
+  "mode": "work",
+  "status": "running",
+  "durationSeconds": 1500,
+  "remainingSeconds": 1122,
+  "startedAt": 1732014000000,
+  "targetEndTime": 1732015122000,
+  "completedCyclesCount": 3,
+  "activeTaskId": "task-uuid-001"
+}

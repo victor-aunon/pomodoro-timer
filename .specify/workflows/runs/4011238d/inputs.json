@@ -1,0 +1,9 @@
+{
+  "inputs": {
+    "spec": "Create a Pomodoro Timer with sound notifications and task history",
+    "has_ui": true,
+    "enable_stitch": true,
+    "integration": "gemini",
+    "auto_continue": true
+  }
+}

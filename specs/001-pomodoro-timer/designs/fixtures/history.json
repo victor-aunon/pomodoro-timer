@@ -1,0 +1,50 @@
+[
+  {
+    "id": "hist-uuid-101",
+    "taskId": "task-uuid-001",
+    "taskTitle": "Refactor Auth & Session Management",
+    "mode": "work",
+    "durationMinutes": 25,
+    "completedAt": 1732010400000
+  },
+  {
+    "id": "hist-uuid-102",
+    "taskId": "task-uuid-001",
+    "taskTitle": "Refactor Auth & Session Management",
+    "mode": "work",
+    "durationMinutes": 25,
+    "completedAt": 1732006800000
+  },
+  {
+    "id": "hist-uuid-103",
+    "taskId": "task-uuid-002",
+    "taskTitle": "Design System Audit & Token Alignment",
+    "mode": "work",
+    "durationMinutes": 25,
+    "completedAt": 1732003200000
+  },
+  {
+    "id": "hist-uuid-104",
+    "taskId": "task-uuid-003",
+    "taskTitle": "Implement Audio Notification Port",
+    "mode": "work",
+    "durationMinutes": 25,
+    "completedAt": 1731926400000
+  },
+  {
+    "id": "hist-uuid-105",
+    "taskId": "task-uuid-003",
+    "taskTitle": "Implement Audio Notification Port",
+    "mode": "work",
+    "durationMinutes": 25,
+    "completedAt": 1731922800000
+  },
+  {
+    "id": "hist-uuid-106",
+    "taskId": null,
+    "taskTitle": "General Focus Session",
+    "mode": "work",
+    "durationMinutes": 25,
+    "completedAt": 1731919200000
+  }
+]
