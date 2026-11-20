@@ -62,7 +62,7 @@ export function usePomodoro({
   const [storageHealth, setStorageHealth] = useState<StorageHealth>(() =>
     persistencePort
       ? persistencePort.getHealth()
-      : { status: 'healthy', storageType: 'memory', warningMessage: null },
+      : { status: 'healthy' as const, storageType: 'memory', warningMessage: null },
   );
   const [isBannerDismissed, setIsBannerDismissed] = useState(false);
   const [transitionEvent, setTransitionEvent] = useState<SessionTransitionEvent | null>(null);
@@ -299,7 +299,7 @@ export function usePomodoro({
     preferences,
     activeTask,
     storageHealth: isBannerDismissed
-      ? { status: 'healthy', storageType: storageHealth.storageType, warningMessage: null }
+      ? { status: 'healthy' as const, storageType: storageHealth.storageType, warningMessage: null }
       : storageHealth,
     transitionEvent,
     dismissTransitionEvent,
